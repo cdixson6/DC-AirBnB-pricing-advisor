@@ -1,0 +1,6 @@
+{
+  "name": "DC Airbnb Pricing Advisor",
+  "description": "Professional Washington, D.C. Airbnb pricing advisor and comp analysis tool for property management advisors and homeowners.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
