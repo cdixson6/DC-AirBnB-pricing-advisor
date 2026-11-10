@@ -1,16 +1,11 @@
-/// <reference types="google.maps" />
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker, InfoWindow, useMap } from '@vis.gl/react-google-maps';
 import L from 'leaflet';
 import { Listing, PropertyIntake, SourceInspectorData } from '../types/listing';
 import { SourceLink } from './SourceLink';
 import {
   MapPin,
-  Compass,
   RefreshCw,
   Home,
-  Check,
-  X,
   ShieldCheck,
   ShieldAlert,
   ArrowRight,
@@ -18,12 +13,10 @@ import {
   Bed,
   Bath,
   Users,
-  Calendar,
-  DollarSign,
   Filter,
-  TrendingUp,
   BarChart2,
-  Award,
+  Layers,
+  DollarSign,
 } from 'lucide-react';
 
 interface IntakePropertyMapProps {
@@ -33,24 +26,27 @@ interface IntakePropertyMapProps {
   onOpenSource?: (data: SourceInspectorData) => void;
 }
 
-// Auto bounds fitter component for Google Maps
-const MapBoundsFitter: React.FC<{ listings: Listing[]; trigger: number }> = ({ listings, trigger }) => {
-  const map = useMap();
+type TileStyle = 'osm' | 'osm-hot' | 'opentopo';
 
-  useEffect(() => {
-    if (!map || listings.length === 0) return;
-    try {
-      const bounds = new google.maps.LatLngBounds();
-      listings.forEach((item) => {
-        bounds.extend({ lat: item.latitude, lng: item.longitude });
-      });
-      map.fitBounds(bounds, { top: 30, right: 30, bottom: 30, left: 30 });
-    } catch (e) {
-      console.warn('Error fitting bounds:', e);
-    }
-  }, [map, listings, trigger]);
-
-  return null;
+const TILE_LAYERS: Record<TileStyle, { name: string; url: string; attribution: string; maxZoom: number }> = {
+  osm: {
+    name: 'OpenStreetMap Standard',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  },
+  'osm-hot': {
+    name: 'Humanitarian OSM',
+    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors, Tiles courtesy of Humanitarian OpenStreetMap Team',
+    maxZoom: 19,
+  },
+  opentopo: {
+    name: 'OpenTopoMap',
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors, &copy; <a href="https://opentopomap.org" target="_blank" rel="noopener noreferrer">OpenTopoMap</a>',
+    maxZoom: 17,
+  },
 };
 
 export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
@@ -62,26 +58,21 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
   // Selected property to display on the right
   const [selectedProperty, setSelectedProperty] = useState<Listing | null>(null);
 
-  // Filter properties on map: 'all' or by specific neighborhood
+  // Filters for the map (Requirement 5: neighborhood, price range, property type)
   const [neighborhoodFilter, setNeighborhoodFilter] = useState<string>('all');
+  const [priceTierFilter, setPriceTierFilter] = useState<'all' | 'value' | 'core' | 'premium'>('all');
+  const [roomTypeFilter, setRoomTypeFilter] = useState<string>('all');
 
-  // Map mode: Roadmap vs Satellite vs CARTO
-  const [mapEngine, setMapEngine] = useState<'google' | 'leaflet'>('google');
-  const [googleMapType, setGoogleMapType] = useState<'roadmap' | 'hybrid'>('roadmap');
+  // Tile layer style - Default to OpenStreetMap Standard (100% free, no watermark, no key required)
+  const [tileStyle, setTileStyle] = useState<TileStyle>('osm');
 
-  // Trigger to refit bounds
-  const [fitTrigger, setFitTrigger] = useState<number>(0);
-
-  // Google Maps API Key
-  const [apiKey, setApiKey] = useState<string>(
-    (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) || ''
-  );
-
-  // Leaflet backup refs
-  const leafletContainerRef = useRef<HTMLDivElement>(null);
+  // Leaflet DOM ref and instance refs
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
 
-  // Unique list of neighborhoods with counts
+  // Unique list of neighborhoods with counts from dataset
   const neighborhoodOptions = useMemo(() => {
     const counts: Record<string, number> = {};
     dataset.forEach((d) => {
@@ -92,17 +83,36 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [dataset]);
 
-  // Filtered dataset for the map
-  const displayedListings = useMemo(() => {
-    if (neighborhoodFilter === 'all') {
-      return dataset;
-    }
-    return dataset.filter(
-      (d) => d.neighbourhood_cleansed.toLowerCase() === neighborhoodFilter.toLowerCase()
-    );
-  }, [dataset, neighborhoodFilter]);
+  // Unique list of room types
+  const roomTypeOptions = useMemo(() => {
+    const set = new Set<string>();
+    dataset.forEach((d) => {
+      if (d.room_type) set.add(d.room_type);
+    });
+    return Array.from(set).sort();
+  }, [dataset]);
 
-  // Live market metrics produced by the current map viewport/filter
+  // Filtered dataset for the map based on user's active filters
+  const displayedListings = useMemo(() => {
+    return dataset.filter((d) => {
+      // Neighborhood filter
+      if (neighborhoodFilter !== 'all' && d.neighbourhood_cleansed.toLowerCase() !== neighborhoodFilter.toLowerCase()) {
+        return false;
+      }
+      // Room type filter
+      if (roomTypeFilter !== 'all' && d.room_type.toLowerCase() !== roomTypeFilter.toLowerCase()) {
+        return false;
+      }
+      // Price tier filter
+      if (priceTierFilter === 'value' && d.price >= 120) return false;
+      if (priceTierFilter === 'core' && (d.price < 120 || d.price > 220)) return false;
+      if (priceTierFilter === 'premium' && d.price <= 220) return false;
+
+      return true;
+    });
+  }, [dataset, neighborhoodFilter, roomTypeFilter, priceTierFilter]);
+
+  // Live market metrics produced by the current map viewport/filters
   const marketMetrics = useMemo(() => {
     if (displayedListings.length === 0) return null;
     const sortedPrices = [...displayedListings].map((l) => l.price).sort((a, b) => a - b);
@@ -127,15 +137,15 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
 
   // Default to selecting the first listing in the current intake neighborhood if none selected
   useEffect(() => {
-    if (!selectedProperty && dataset.length > 0) {
-      const match = dataset.find(
+    if (!selectedProperty && displayedListings.length > 0) {
+      const match = displayedListings.find(
         (d) => d.neighbourhood_cleansed.toLowerCase() === currentIntake.neighborhood.toLowerCase()
       );
-      setSelectedProperty(match || dataset[0]);
+      setSelectedProperty(match || displayedListings[0]);
     }
-  }, [dataset, currentIntake.neighborhood, selectedProperty]);
+  }, [displayedListings, currentIntake.neighborhood, selectedProperty]);
 
-  // Center coordinate of displayed listings
+  // Center coordinate of displayed listings or DC centroid (38.9072, -77.0369)
   const center = useMemo(() => {
     if (displayedListings.length === 0) {
       return { lat: 38.9072, lng: -77.0369 };
@@ -145,28 +155,151 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
     return { lat, lng };
   }, [displayedListings]);
 
-  // Fetch API key from server if not already in client env
+  // Initialize Leaflet Map once
   useEffect(() => {
-    if (!apiKey) {
-      fetch('/api/config/maps')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.apiKey) {
-            setApiKey(data.apiKey);
-          }
-        })
-        .catch((err) => {
-          console.warn('Could not load Google Maps API key from config endpoint:', err);
-        });
+    if (!mapContainerRef.current) return;
+
+    // Destroy existing instance if any
+    if (leafletMapRef.current) {
+      leafletMapRef.current.remove();
+      leafletMapRef.current = null;
     }
-  }, [apiKey]);
+
+    const map = L.map(mapContainerRef.current, {
+      center: [center.lat, center.lng],
+      zoom: 12,
+      zoomControl: true,
+      scrollWheelZoom: true,
+    });
+
+    const activeTile = TILE_LAYERS[tileStyle];
+    const tileLayer = L.tileLayer(activeTile.url, {
+      maxZoom: activeTile.maxZoom,
+      attribution: activeTile.attribution,
+    }).addTo(map);
+
+    tileLayerRef.current = tileLayer;
+
+    const markersLayer = L.layerGroup().addTo(map);
+    markersLayerRef.current = markersLayer;
+    leafletMapRef.current = map;
+
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    return () => {
+      clearTimeout(timer);
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update tile layer when tileStyle changes
+  useEffect(() => {
+    if (!leafletMapRef.current) return;
+    if (tileLayerRef.current) {
+      leafletMapRef.current.removeLayer(tileLayerRef.current);
+    }
+    const activeTile = TILE_LAYERS[tileStyle];
+    const newTileLayer = L.tileLayer(activeTile.url, {
+      maxZoom: activeTile.maxZoom,
+      attribution: activeTile.attribution,
+    }).addTo(leafletMapRef.current);
+    tileLayerRef.current = newTileLayer;
+  }, [tileStyle]);
+
+  // Update Markers when displayedListings or selectedProperty changes
+  useEffect(() => {
+    if (!leafletMapRef.current || !markersLayerRef.current) return;
+
+    markersLayerRef.current.clearLayers();
+    const markers: L.Marker[] = [];
+    const subset = displayedListings.slice(0, 600); // Render up to 600 markers for peak performance
+
+    subset.forEach((listing) => {
+      let bgColor = '#1d4ed8'; // Blue: Core market $120–$220
+      if (listing.price < 120) {
+        bgColor = '#059669'; // Green: Value < $120
+      } else if (listing.price > 220) {
+        bgColor = '#7e22ce'; // Purple: Premium > $220
+      }
+
+      const isSelected = selectedProperty?.id === listing.id;
+
+      const customIcon = L.divIcon({
+        className: 'custom-comp-marker',
+        html: `
+          <div style="
+            background-color: ${bgColor};
+            color: #ffffff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            border: ${isSelected ? '2.5px solid #fbbf24' : '1.5px solid #ffffff'};
+            box-shadow: ${isSelected ? '0 0 0 2px #d97706, 0 4px 8px rgba(0,0,0,0.35)' : '0 2px 4px rgba(0, 0, 0, 0.25)'};
+            white-space: nowrap;
+            cursor: pointer;
+            transform: translate(-50%, -50%) ${isSelected ? 'scale(1.2)' : 'scale(1)'};
+            transition: transform 0.15s ease-in-out;
+          ">
+            $${listing.price}
+          </div>
+        `,
+        iconSize: [40, 20],
+        iconAnchor: [20, 10],
+      });
+
+      const marker = L.marker([listing.latitude, listing.longitude], { icon: customIcon });
+
+      // Click event selects property and shows popup
+      marker.on('click', () => {
+        setSelectedProperty(listing);
+      });
+
+      // Bind rich Leaflet popup with all property specifications
+      const popupHtml = `
+        <div style="font-family: system-ui, -apple-system, sans-serif; padding: 2px; min-width: 170px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 4px;">
+            <span style="font-size: 14px; font-weight: 800; color: #0f172a;">$${listing.price} <span style="font-size: 10px; font-weight: normal; color: #64748b;">/ nt</span></span>
+            <span style="font-size: 9px; font-weight: 700; background-color: #dbeafe; color: #1e40af; padding: 1px 4px; border-radius: 4px;">#${listing.id}</span>
+          </div>
+          <div style="font-size: 11px; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${listing.property_type || 'Apartment'}
+          </div>
+          <div style="font-size: 10px; color: #64748b; margin-top: 2px;">
+            ${listing.neighbourhood_cleansed}
+          </div>
+          <div style="font-size: 10px; color: #334155; margin-top: 4px; padding-top: 4px; border-top: 1px solid #f1f5f9;">
+            ${listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} BR`} • ${listing.bathrooms} BA • Max ${listing.accommodates} guests
+          </div>
+          <div style="font-size: 10px; font-weight: 600; color: ${listing.has_license ? '#059669' : '#d97706'}; margin-top: 3px;">
+            ${listing.has_license ? '✓ DC Licensed STR' : '⚠ Unlicensed / Exempt'}
+          </div>
+        </div>
+      `;
+      marker.bindPopup(popupHtml, { maxWidth: 240, closeButton: false });
+
+      markersLayerRef.current?.addLayer(marker);
+      markers.push(marker);
+    });
+
+    // Auto fit bounds on filter changes
+    if (markers.length > 0 && leafletMapRef.current) {
+      const group = L.featureGroup(markers);
+      leafletMapRef.current.fitBounds(group.getBounds().pad(0.12));
+    }
+  }, [displayedListings, selectedProperty]);
 
   const handleResetBounds = () => {
-    setFitTrigger((prev) => prev + 1);
-    if (mapEngine === 'leaflet' && leafletMapRef.current && displayedListings.length > 0) {
+    if (leafletMapRef.current && displayedListings.length > 0) {
       const markers = displayedListings.slice(0, 500).map((c) => L.marker([c.latitude, c.longitude]));
       const group = L.featureGroup(markers);
-      leafletMapRef.current.fitBounds(group.getBounds().pad(0.1));
+      leafletMapRef.current.fitBounds(group.getBounds().pad(0.12));
     }
   };
 
@@ -202,6 +335,8 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
       formula: 'MEDIAN(price) and IQR 25th-75th percentiles of listings matching map filter.',
       filtersUsed: [
         { label: 'Neighborhood Filter', value: neighborhoodFilter === 'all' ? 'All DC' : neighborhoodFilter },
+        { label: 'Room Type Filter', value: roomTypeFilter === 'all' ? 'All Types' : roomTypeFilter },
+        { label: 'Price Tier Filter', value: priceTierFilter.toUpperCase() },
         { label: 'Total Listings in Set', value: `${marketMetrics.count}` },
         { label: 'Core Market Band (IQR)', value: `$${marketMetrics.p25Price} – $${marketMetrics.p75Price}` },
         { label: 'DC License Rate', value: `${marketMetrics.licensedPercent}%` },
@@ -212,90 +347,10 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
     });
   };
 
-  // Leaflet backup map renderer
-  useEffect(() => {
-    if (mapEngine !== 'leaflet') return;
-    if (!leafletContainerRef.current) return;
-
-    if (leafletMapRef.current) {
-      leafletMapRef.current.remove();
-      leafletMapRef.current = null;
-    }
-
-    const map = L.map(leafletContainerRef.current, {
-      center: [center.lat, center.lng],
-      zoom: 12,
-      zoomControl: true,
-      scrollWheelZoom: false,
-    });
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
-    }).addTo(map);
-
-    const markers: L.Marker[] = [];
-    const subset = displayedListings.slice(0, 600);
-
-    subset.forEach((listing) => {
-      let bgColor = '#1e40af';
-      if (listing.price < 120) bgColor = '#059669';
-      else if (listing.price > 220) bgColor = '#7c3aed';
-
-      const customIcon = L.divIcon({
-        className: 'custom-comp-marker',
-        html: `
-          <div style="
-            background-color: ${bgColor};
-            color: #ffffff;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 9999px;
-            border: 1.5px solid #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-            white-space: nowrap;
-            cursor: pointer;
-            transform: translate(-50%, -50%);
-          ">
-            $${listing.price}
-          </div>
-        `,
-        iconSize: [40, 20],
-        iconAnchor: [20, 10],
-      });
-
-      const marker = L.marker([listing.latitude, listing.longitude], { icon: customIcon });
-      marker.on('click', () => setSelectedProperty(listing));
-      marker.addTo(map);
-      markers.push(marker);
-    });
-
-    leafletMapRef.current = map;
-
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-      if (markers.length > 0) {
-        const group = L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.1));
-      }
-    }, 150);
-
-    return () => {
-      clearTimeout(timer);
-      if (leafletMapRef.current) {
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
-      }
-    };
-  }, [mapEngine, displayedListings, center]);
-
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 mb-7">
       {/* Top Section Header with Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2.5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-3 border-b border-slate-100 gap-2.5">
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-blue-100 text-blue-800 rounded-lg shrink-0">
             <MapPin className="w-4 h-4" />
@@ -305,28 +360,25 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
               <h2 className="text-sm font-bold text-slate-900">
                 Washington, D.C. Property Explorer
               </h2>
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <Compass className="w-2.5 h-2.5" />
-                Google Maps
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <Layers className="w-2.5 h-2.5 text-emerald-700" />
+                Leaflet &amp; OpenStreetMap
               </span>
               <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
-                {displayedListings.length.toLocaleString()} listings
+                {displayedListings.length.toLocaleString()} matching listings
               </span>
             </div>
           </div>
         </div>
 
-        {/* Toolbar Controls */}
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
-          {/* Quick neighborhood filter */}
+        {/* Toolbar Filter Controls (Requirement 5: filter by neighborhood, price range, property type) */}
+        <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
+          {/* Neighborhood filter */}
           <div className="flex items-center gap-1.5 text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1">
             <Filter className="w-3 h-3 text-slate-400 shrink-0" />
             <select
               value={neighborhoodFilter}
-              onChange={(e) => {
-                setNeighborhoodFilter(e.target.value);
-                setFitTrigger((prev) => prev + 1);
-              }}
+              onChange={(e) => setNeighborhoodFilter(e.target.value)}
               className="bg-transparent text-xs text-slate-800 font-medium focus:outline-hidden cursor-pointer"
             >
               <option value="all">All DC Neighborhoods ({dataset.length})</option>
@@ -338,14 +390,43 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
             </select>
           </div>
 
+          {/* Price Range Filter */}
+          <div className="flex items-center gap-1 text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1">
+            <DollarSign className="w-3 h-3 text-slate-400 shrink-0" />
+            <select
+              value={priceTierFilter}
+              onChange={(e) => setPriceTierFilter(e.target.value as any)}
+              className="bg-transparent text-xs text-slate-800 font-medium focus:outline-hidden cursor-pointer"
+            >
+              <option value="all">All Prices</option>
+              <option value="value">Value (&lt; $120)</option>
+              <option value="core">Core ($120–$220)</option>
+              <option value="premium">Premium (&gt; $220)</option>
+            </select>
+          </div>
+
+          {/* Room / Property Type Filter */}
+          <div className="flex items-center gap-1 text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1">
+            <Home className="w-3 h-3 text-slate-400 shrink-0" />
+            <select
+              value={roomTypeFilter}
+              onChange={(e) => setRoomTypeFilter(e.target.value)}
+              className="bg-transparent text-xs text-slate-800 font-medium focus:outline-hidden cursor-pointer"
+            >
+              <option value="all">All Room Types</option>
+              {roomTypeOptions.map((rt) => (
+                <option key={rt} value={rt}>
+                  {rt}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Quick Jump to current intake neighborhood */}
           {neighborhoodFilter !== currentIntake.neighborhood && (
             <button
               type="button"
-              onClick={() => {
-                setNeighborhoodFilter(currentIntake.neighborhood);
-                setFitTrigger((prev) => prev + 1);
-              }}
+              onClick={() => setNeighborhoodFilter(currentIntake.neighborhood)}
               className="text-[11px] font-medium text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 transition cursor-pointer"
               title="Filter to currently selected intake neighborhood"
             >
@@ -353,46 +434,43 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
             </button>
           )}
 
-          {/* Map Layer Switcher */}
+          {/* OpenStreetMap Tile Layer Switcher */}
           <div className="inline-flex rounded-md border border-slate-200 bg-slate-100 p-0.5 text-[11px]">
             <button
               type="button"
-              onClick={() => {
-                setMapEngine('google');
-                setGoogleMapType('roadmap');
-              }}
+              onClick={() => setTileStyle('osm')}
               className={`px-2 py-0.5 rounded font-medium transition cursor-pointer ${
-                mapEngine === 'google' && googleMapType === 'roadmap'
+                tileStyle === 'osm'
                   ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Official OpenStreetMap Standard tile server"
             >
-              Roadmap
+              OSM Standard
             </button>
             <button
               type="button"
-              onClick={() => {
-                setMapEngine('google');
-                setGoogleMapType('hybrid');
-              }}
+              onClick={() => setTileStyle('osm-hot')}
               className={`px-2 py-0.5 rounded font-medium transition cursor-pointer ${
-                mapEngine === 'google' && googleMapType === 'hybrid'
+                tileStyle === 'osm-hot'
                   ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Humanitarian OpenStreetMap Team high-contrast style"
             >
-              Satellite
+              Humanitarian
             </button>
             <button
               type="button"
-              onClick={() => setMapEngine('leaflet')}
+              onClick={() => setTileStyle('opentopo')}
               className={`px-2 py-0.5 rounded font-medium transition cursor-pointer ${
-                mapEngine === 'leaflet'
+                tileStyle === 'opentopo'
                   ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="OpenTopoMap topographic elevation layer"
             >
-              CARTO
+              Topographic
             </button>
           </div>
 
@@ -408,89 +486,16 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
         </div>
       </div>
 
-      {/* Main 2-Column Section: Smaller Compact Map on Left (approx 42-45%), Rich Metrics Dashboard on Right (approx 55-58%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3.5">
-        {/* Left Column: Smaller, compact Google Map */}
-        <div className="lg:col-span-5 flex flex-col">
-          <div className="relative w-full h-[340px] rounded-lg overflow-hidden border border-slate-200 shadow-inner bg-slate-100">
-            {mapEngine === 'google' ? (
-              <APIProvider apiKey={apiKey} libraries={['marker']}>
-                <Map
-                  mapId="DEMO_MAP_ID"
-                  mapTypeId={googleMapType}
-                  defaultCenter={center}
-                  defaultZoom={12}
-                  gestureHandling="greedy"
-                  disableDefaultUI={false}
-                  internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
-                  style={{ width: '100%', height: '100%' }}
-                >
-                  <MapBoundsFitter listings={displayedListings} trigger={fitTrigger} />
-
-                  {/* Render pins for displayed listings */}
-                  {displayedListings.map((listing) => {
-                    let badgeColor = 'bg-blue-700 hover:bg-blue-800 text-white border-white';
-                    if (listing.price < 120) {
-                      badgeColor = 'bg-emerald-600 hover:bg-emerald-700 text-white border-white';
-                    } else if (listing.price > 220) {
-                      badgeColor = 'bg-purple-700 hover:bg-purple-800 text-white border-white';
-                    }
-
-                    const isSelected = selectedProperty?.id === listing.id;
-
-                    return (
-                      <AdvancedMarker
-                        key={listing.id}
-                        position={{ lat: listing.latitude, lng: listing.longitude }}
-                        onClick={() => setSelectedProperty(listing)}
-                        title={`#${listing.id} - $${listing.price}/night - ${listing.property_type}`}
-                      >
-                        <div
-                          className={`font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-full border shadow-2xs cursor-pointer transition transform ${badgeColor} ${
-                            isSelected
-                              ? 'scale-125 ring-2 ring-amber-400 z-50 shadow-md'
-                              : 'hover:scale-110'
-                          }`}
-                        >
-                          ${listing.price}
-                        </div>
-                      </AdvancedMarker>
-                    );
-                  })}
-
-                  {/* InfoWindow for currently selected property on map */}
-                  {selectedProperty && (
-                    <InfoWindow
-                      position={{ lat: selectedProperty.latitude, lng: selectedProperty.longitude }}
-                      onCloseClick={() => {}}
-                      maxWidth={220}
-                    >
-                      <div className="p-0.5 font-sans text-slate-800">
-                        <div className="flex items-baseline justify-between border-b border-slate-200 pb-0.5 mb-1">
-                          <span className="font-extrabold text-xs text-slate-900">
-                            ${selectedProperty.price} <span className="text-[9px] text-slate-500 font-normal">/ nt</span>
-                          </span>
-                          <span className="text-[9px] font-bold bg-blue-100 text-blue-800 px-1 py-0.2 rounded">
-                            #{selectedProperty.id}
-                          </span>
-                        </div>
-                        <div className="text-[10px] font-semibold text-slate-900 truncate">
-                          {selectedProperty.property_type}
-                        </div>
-                        <div className="text-[9px] text-slate-500 truncate">
-                          {selectedProperty.neighbourhood_cleansed}
-                        </div>
-                      </div>
-                    </InfoWindow>
-                  )}
-                </Map>
-              </APIProvider>
-            ) : (
-              <div ref={leafletContainerRef} className="w-full h-full min-h-[340px]" />
-            )}
+      {/* Main 2-Column Section: Compact Map on Left, Selected Apartment Details on Right at Same Height Level */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-3.5 items-stretch">
+        {/* Left Column: Compact Leaflet + OpenStreetMap */}
+        <div className="md:col-span-5 lg:col-span-4 flex flex-col h-full">
+          <div className="relative w-full flex-1 min-h-[380px] md:min-h-0 rounded-lg overflow-hidden border border-slate-200 shadow-inner bg-slate-100">
+            {/* Native Leaflet Map Container */}
+            <div ref={mapContainerRef} className="w-full h-full min-h-[380px] md:min-h-0 z-0" />
 
             {/* Quick Map Legend Overlay */}
-            <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-xs px-2 py-1 rounded border border-slate-200 text-[9px] text-slate-600 shadow-2xs flex items-center gap-2.5 z-10">
+            <div className="absolute bottom-6 left-2 bg-white/95 backdrop-blur-xs px-2 py-1 rounded border border-slate-200 text-[9px] text-slate-600 shadow-2xs flex items-center gap-2.5 z-10">
               <span className="font-semibold text-slate-800">Tiers:</span>
               <span className="flex items-center gap-0.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" /> &lt;$120
@@ -504,20 +509,20 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
             </div>
           </div>
 
-          <div className="mt-1.5 text-[10px] text-slate-400 flex items-center justify-between">
-            <span>Click any pin to inspect property metrics.</span>
-            <span>Google Maps Platform</span>
+          <div className="mt-1.5 text-[10px] text-slate-500 flex items-center justify-between shrink-0">
+            <span>Click any price badge on the map to inspect property details.</span>
+            <span className="font-medium text-slate-600">Open-Source Leaflet &amp; OSM</span>
           </div>
         </div>
 
-        {/* Right Column: Prominent Metrics Dashboard produced by the Map */}
-        <div className="lg:col-span-7 flex flex-col justify-between bg-slate-50 border border-slate-200 rounded-lg p-4 min-h-[340px]">
+        {/* Right Column: Prominent Apartment Details & Metrics Dashboard at Same Height Level */}
+        <div className="md:col-span-7 lg:col-span-8 flex flex-col justify-between bg-slate-50 border border-slate-200 rounded-lg p-4 h-full">
           {selectedProperty ? (
             <div className="space-y-3.5">
               {/* Selected Property Header */}
               <div className="flex items-start justify-between gap-2 border-b border-slate-200 pb-2.5">
                 <div>
-                  <div className="flex items-center gap-1.5 mb-1">
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-900 px-1.5 py-0.5 rounded">
                       Listing #{selectedProperty.id}
                     </span>
@@ -617,7 +622,7 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
                       View Source ({marketMetrics.count} comps)
                     </button>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 pt-1.5 text-center text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1.5 text-center text-xs">
                     <div>
                       <div className="text-[10px] text-slate-500">Median Rate</div>
                       <div className="font-bold font-mono text-slate-900">${marketMetrics.medianPrice}</div>
@@ -652,7 +657,7 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
                   <span>Accommodates {selectedProperty.accommodates}</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[10px]">
+                <div className="flex items-center gap-1.5 text-[10px] flex-wrap">
                   {selectedProperty.has_license ? (
                     <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
                       <ShieldCheck className="w-3 h-3 text-emerald-600" />
@@ -705,7 +710,7 @@ export const IntakePropertyMap: React.FC<IntakePropertyMapProps> = ({
               <MapPin className="w-8 h-8 text-blue-700 animate-bounce mb-2" />
               <div className="text-sm font-bold text-slate-800">Select Any Property on the Map</div>
               <div className="text-xs text-slate-500 max-w-sm mt-1">
-                Click any price pin on the compact Google Map to produce complete performance metrics, revenue projections, and DC regulatory benchmarks on this panel.
+                Click any price pin on the OpenStreetMap interactive map to produce complete performance metrics, revenue projections, and DC regulatory benchmarks on this panel.
               </div>
             </div>
           )}

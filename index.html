@@ -10,6 +10,26 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script>
+      // Ignore HMR WebSocket errors per AI Studio environment constraints
+      window.addEventListener('unhandledrejection', function (e) {
+        var reason = e && (e.reason || '');
+        var msg = String(reason.message || reason || '');
+        var stack = String(reason.stack || '');
+        if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('vite:ws') !== -1 || stack.indexOf('@vite/client') !== -1) {
+          e.preventDefault();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        }
+      });
+      window.addEventListener('error', function (e) {
+        var msg = String((e && e.message) || '');
+        var filename = String((e && e.filename) || '');
+        if (msg.indexOf('WebSocket') !== -1 || filename.indexOf('@vite/client') !== -1) {
+          e.preventDefault();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
