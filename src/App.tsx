@@ -111,7 +111,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-[#FFF8F3] text-[#1F3442] font-sans antialiased">
       {/* Global Navigation Header */}
       <Header
         currentScreen={currentScreen}
@@ -142,23 +142,23 @@ export default function App() {
       <main className="flex-1">
         {loading && (
           <div className="max-w-md mx-auto py-24 px-4 text-center space-y-4">
-            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-700 rounded-full animate-spin mx-auto" />
-            <h2 className="text-lg font-bold text-slate-900">Loading Washington, DC Dataset...</h2>
-            <p className="text-xs text-slate-500">
+            <div className="w-12 h-12 border-4 border-[#D8EEF5] border-t-[#E76F51] rounded-full animate-spin mx-auto" />
+            <h2 className="text-lg font-bold text-[#1877A3]">Loading Washington, DC Dataset...</h2>
+            <p className="text-xs text-[#4A6375]">
               Reading and parsing /data/dc_listings_clean.csv with PapaParse.
             </p>
           </div>
         )}
 
         {error && !loading && (
-          <div className="max-w-2xl mx-auto my-12 p-6 bg-rose-50 border border-rose-200 rounded-xl space-y-4 text-center">
-            <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
-            <h2 className="text-lg font-bold text-rose-950">Data Source Initialization Error</h2>
-            <p className="text-sm text-rose-800">{error}</p>
+          <div className="max-w-2xl mx-auto my-12 p-6 bg-[#FDF0EC] border border-[#E76F51]/30 rounded-xl space-y-4 text-center">
+            <AlertCircle className="w-10 h-10 text-[#E76F51] mx-auto" />
+            <h2 className="text-lg font-bold text-[#1F3442]">Data Source Initialization Error</h2>
+            <p className="text-sm text-[#4A6375]">{error}</p>
             <div className="pt-2">
               <button
                 onClick={() => setIsUploadOpen(true)}
-                className="px-5 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-lg text-xs shadow-sm transition cursor-pointer"
+                className="px-5 py-2.5 bg-[#E76F51] hover:bg-[#D55C3E] text-white font-bold rounded-lg text-xs shadow-sm transition cursor-pointer"
               >
                 Upload Replacement CSV File
               </button>
@@ -193,6 +193,7 @@ export default function App() {
       <Footer
         snapshotDate={snapshotDate}
         rowCount={totalRows}
+        onOpenUpload={() => setIsUploadOpen(true)}
         onOpenSource={() =>
           setActiveSourceData({
             title: 'Washington, D.C. Cleaned Dataset Registry',

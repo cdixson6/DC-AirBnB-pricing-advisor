@@ -133,11 +133,11 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
     const markers: L.Marker[] = [];
 
     comps.forEach((comp) => {
-      let bgColor = '#1d4ed8'; // Blue: Core market
+      let bgColor = '#1877A3'; // Ocean Blue: Core market
       if (comp.price < p25Price) {
-        bgColor = '#059669'; // Green: Value tier
+        bgColor = '#39B8A2'; // Fresh Teal: Value tier
       } else if (comp.price > p75Price) {
-        bgColor = '#7e22ce'; // Purple: Premium tier
+        bgColor = '#E76F51'; // Terracotta: Premium tier
       }
 
       const isSelected = selectedComp?.id === comp.id;
@@ -149,12 +149,13 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
             background-color: ${bgColor};
             color: #ffffff;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 11px;
+            font-size: 9.5px;
             font-weight: 700;
-            padding: 2px 7px;
+            line-height: 1;
+            padding: 2px 4.5px;
             border-radius: 9999px;
-            border: ${isSelected ? '2.5px solid #fbbf24' : '2px solid #ffffff'};
-            box-shadow: ${isSelected ? '0 0 0 2px #d97706, 0 6px 10px rgba(0,0,0,0.4)' : '0 4px 6px -1px rgba(0, 0, 0, 0.3)'};
+            border: ${isSelected ? '2px solid #FFF8F3' : '1px solid #ffffff'};
+            box-shadow: ${isSelected ? '0 0 0 2px #E76F51, 0 3px 6px rgba(31,52,66,0.4)' : '0 1px 3px rgba(31, 52, 66, 0.3)'};
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
@@ -166,8 +167,8 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
             $${comp.price}
           </div>
         `,
-        iconSize: [44, 24],
-        iconAnchor: [22, 12],
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
       });
 
       const marker = L.marker([comp.latitude, comp.longitude], { icon: customIcon });
@@ -179,41 +180,41 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
       // Bind detailed popup
       const popupHtml = `
         <div style="font-family: system-ui, -apple-system, sans-serif; padding: 2px; min-width: 200px;">
-          <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 6px;">
-            <div style="font-size: 16px; font-weight: 800; color: #0f172a;">
-              $${comp.price} <span style="font-size: 11px; font-weight: normal; color: #64748b;">/ night</span>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #EFE3D8; padding-bottom: 6px; margin-bottom: 6px;">
+            <div style="font-size: 16px; font-weight: 800; color: #1F3442;">
+              $${comp.price} <span style="font-size: 11px; font-weight: normal; color: #4B6375;">/ night</span>
             </div>
-            <span style="font-size: 10px; font-weight: 700; background-color: #dbeafe; color: #1e40af; padding: 1px 6px; border-radius: 4px;">#${comp.id}</span>
+            <span style="font-size: 10px; font-weight: 700; background-color: #D8EEF5; color: #1877A3; padding: 1px 6px; border-radius: 4px;">#${comp.id}</span>
           </div>
 
-          <div style="font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 2px;">
+          <div style="font-size: 12px; font-weight: 700; color: #1877A3; margin-bottom: 2px;">
             ${comp.property_type}
           </div>
-          <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">
+          <div style="font-size: 11px; color: #4B6375; margin-bottom: 6px;">
             ${comp.bedrooms === 0 ? 'Studio' : `${comp.bedrooms} BR`} • ${comp.bathrooms} BA • Accommodates ${comp.accommodates}
           </div>
 
-          <div style="background-color: #f8fafc; padding: 6px; border-radius: 6px; border: 1px solid #f1f5f9; font-size: 11px; margin-bottom: 6px;">
+          <div style="background-color: #FFF8F3; padding: 6px; border-radius: 6px; border: 1px solid #EFE3D8; font-size: 11px; margin-bottom: 6px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-              <span style="color: #64748b;">Rating:</span>
-              <span style="font-weight: 700; color: #b45309;">${comp.review_scores_rating.toFixed(2)} ★ (${comp.number_of_reviews_ltm} LTM)</span>
+              <span style="color: #4B6375;">Rating:</span>
+              <span style="font-weight: 700; color: #E76F51;">${comp.review_scores_rating.toFixed(2)} ★ (${comp.number_of_reviews_ltm} LTM)</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-              <span style="color: #64748b;">Est. Occupancy:</span>
-              <span style="font-weight: 600; color: #1e293b;">${comp.estimated_occupancy_l365d} nights/yr</span>
+              <span style="color: #4B6375;">Est. Occupancy:</span>
+              <span style="font-weight: 600; color: #1F3442;">${comp.estimated_occupancy_l365d} nights/yr</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span style="color: #64748b;">Est. Annual Gross:</span>
-              <span style="font-weight: 700; color: #047857;">$${(comp.price * comp.estimated_occupancy_l365d).toLocaleString()}</span>
+              <span style="color: #4B6375;">Est. Annual Gross:</span>
+              <span style="font-weight: 700; color: #39B8A2;">$${(comp.price * comp.estimated_occupancy_l365d).toLocaleString()}</span>
             </div>
           </div>
 
           <div style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 10px;">
-            ${comp.is_condo ? '<span style="background-color: #f1f5f9; color: #334155; padding: 1px 5px; border-radius: 3px;">Condo</span>' : ''}
-            ${comp.has_washer ? '<span style="background-color: #f1f5f9; color: #334155; padding: 1px 5px; border-radius: 3px;">Washer</span>' : ''}
-            ${comp.has_parking ? '<span style="background-color: #f1f5f9; color: #334155; padding: 1px 5px; border-radius: 3px;">Parking</span>' : ''}
-            ${comp.has_workspace ? '<span style="background-color: #f1f5f9; color: #334155; padding: 1px 5px; border-radius: 3px;">Workspace</span>' : ''}
-            ${comp.has_license ? '<span style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 1px 5px; border-radius: 3px; font-weight: 600;">✓ DC Licensed</span>' : ''}
+            ${comp.is_condo ? '<span style="background-color: #D8EEF5; color: #1877A3; padding: 1px 5px; border-radius: 3px;">Condo</span>' : ''}
+            ${comp.has_washer ? '<span style="background-color: #D8EEF5; color: #1877A3; padding: 1px 5px; border-radius: 3px;">Washer</span>' : ''}
+            ${comp.has_parking ? '<span style="background-color: #D8EEF5; color: #1877A3; padding: 1px 5px; border-radius: 3px;">Parking</span>' : ''}
+            ${comp.has_workspace ? '<span style="background-color: #D8EEF5; color: #1877A3; padding: 1px 5px; border-radius: 3px;">Workspace</span>' : ''}
+            ${comp.has_license ? '<span style="background-color: #D8EEF5; color: #1877A3; border: 1px solid #BBE0EC; padding: 1px 5px; border-radius: 3px; font-weight: 600;">✓ DC Licensed</span>' : ''}
           </div>
         </div>
       `;
@@ -230,24 +231,24 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
   }, [comps, p25Price, p75Price, selectedComp]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
+    <div className="bg-white rounded-xl border border-[#EFE3D8] shadow-xs p-5 flex flex-col">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#EFE3D8] gap-2">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-blue-50 text-blue-800 rounded-lg">
+          <div className="p-1.5 bg-[#D8EEF5] text-[#1877A3] rounded-lg">
             <MapPin className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm font-bold text-slate-900">Geographic Comp Distribution</h3>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                <Layers className="w-3 h-3 text-emerald-700" />
+              <h3 className="text-sm font-bold text-[#1877A3]">Geographic Comp Distribution</h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#D8EEF5] text-[#1877A3] border border-[#BBE0EC]">
+                <Layers className="w-3 h-3 text-[#1877A3]" />
                 Leaflet &amp; OpenStreetMap
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+            <div className="flex items-center gap-1.5 text-xs text-[#4B6375]">
               <span>Interactive map of</span>
-              <strong className="text-slate-800 font-mono">{comps.length}</strong>
+              <strong className="text-[#1F3442] font-mono">{comps.length}</strong>
               <span>comps in {analysis.intake.neighborhood}</span>
               <SourceLink
                 variant="subtle"
@@ -259,13 +260,13 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
           {/* Tile Layer switcher */}
-          <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-[11px]">
+          <div className="inline-flex rounded-lg border border-[#EFE3D8] bg-[#FFF8F3] p-0.5 text-[11px]">
             <button
               onClick={() => setTileStyle('osm')}
               className={`px-2 py-0.5 rounded-md font-medium transition cursor-pointer ${
                 tileStyle === 'osm'
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#1877A3] text-white shadow-2xs font-semibold'
+                  : 'text-[#1F3442] hover:text-[#1877A3]'
               }`}
               title="Official OpenStreetMap Standard tile server"
             >
@@ -275,8 +276,8 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
               onClick={() => setTileStyle('osm-hot')}
               className={`px-2 py-0.5 rounded-md font-medium transition cursor-pointer ${
                 tileStyle === 'osm-hot'
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#1877A3] text-white shadow-2xs font-semibold'
+                  : 'text-[#1F3442] hover:text-[#1877A3]'
               }`}
               title="Humanitarian OpenStreetMap Team high-contrast style"
             >
@@ -286,8 +287,8 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
               onClick={() => setTileStyle('opentopo')}
               className={`px-2 py-0.5 rounded-md font-medium transition cursor-pointer ${
                 tileStyle === 'opentopo'
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#1877A3] text-white shadow-2xs font-semibold'
+                  : 'text-[#1F3442] hover:text-[#1877A3]'
               }`}
               title="OpenTopoMap topographic elevation layer"
             >
@@ -297,10 +298,10 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
 
           <button
             onClick={handleResetView}
-            className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-md transition cursor-pointer border border-slate-200"
+            className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F3442] bg-[#D8EEF5]/60 hover:bg-[#D8EEF5] px-2.5 py-1 rounded-md transition cursor-pointer border border-[#BBE0EC]"
             title="Recenter and fit all comps into view"
           >
-            <RefreshCw className="w-3 h-3 text-slate-500" />
+            <RefreshCw className="w-3 h-3 text-[#1877A3]" />
             <span>Fit All</span>
           </button>
           <SourceLink onClick={handleSourceClick} />
@@ -308,12 +309,12 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
       </div>
 
       {/* Price Legend with Source links beside every tier */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 py-2.5 px-3 bg-slate-50 border-b border-slate-100 text-xs text-slate-600">
-        <span className="font-semibold text-slate-800 flex items-center gap-1 text-[11px]">
-          <Layers className="w-3.5 h-3.5 text-slate-500" /> Price Tiers:
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 py-2.5 px-3 bg-[#D8EEF5]/25 border-b border-[#BBE0EC] text-xs text-[#1F3442]">
+        <span className="font-semibold text-[#1877A3] flex items-center gap-1 text-[11px]">
+          <Layers className="w-3.5 h-3.5 text-[#1877A3]" /> Price Tiers:
         </span>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-emerald-600 inline-block shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[#39B8A2] inline-block shrink-0" />
           <span>Value Tier (&lt; ${p25Price})</span>
           <SourceLink
             variant="subtle"
@@ -321,7 +322,7 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
           />
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-blue-700 inline-block shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[#1877A3] inline-block shrink-0" />
           <span>Core Market (${p25Price} – ${p75Price})</span>
           <SourceLink
             variant="subtle"
@@ -329,7 +330,7 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
           />
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded-full bg-purple-700 inline-block shrink-0" />
+          <span className="w-3 h-3 rounded-full bg-[#E76F51] inline-block shrink-0" />
           <span>Premium Tier (&gt; ${p75Price})</span>
           <SourceLink
             variant="subtle"
@@ -339,12 +340,12 @@ export const CompMap: React.FC<CompMapProps> = ({ analysis, onOpenSource }) => {
       </div>
 
       {/* Map Canvas Container */}
-      <div className="relative w-full h-[460px] rounded-b-lg overflow-hidden border border-slate-200 z-0 bg-slate-100">
+      <div className="relative w-full h-[460px] rounded-b-lg overflow-hidden border border-[#EFE3D8] z-0 bg-[#FFF8F3]">
         <div ref={mapContainerRef} className="w-full h-full min-h-[460px] z-0" />
       </div>
 
       {/* Map Footer Note */}
-      <div className="mt-2.5 text-[11px] text-slate-500 flex flex-wrap items-center justify-between gap-2">
+      <div className="mt-2.5 text-[11px] text-[#4B6375] flex flex-wrap items-center justify-between gap-2">
         <span>Click any price badge on the map to inspect full listing specifications and revenue metrics.</span>
         <div className="flex items-center gap-2">
           <span>Powered by Open-Source Leaflet &amp; OpenStreetMap</span>

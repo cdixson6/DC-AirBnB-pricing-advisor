@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+@theme {
+  --color-terracotta: #E76F51;
+  --color-terracotta-hover: #D55C3E;
+  --color-terracotta-dark: #B8472C;
+  --color-terracotta-light: #FDF0EC;
+
+  --color-ocean: #1877A3;
+  --color-ocean-dark: #125C7E;
+  --color-ocean-light: #218CB8;
+  --color-ocean-tint: #EAF4F8;
+
+  --color-cream: #FFF8F3;
+  --color-cream-card: #FFFFFF;
+  --color-cream-border: #EFE3D8;
+
+  --color-lightblue: #D8EEF5;
+  --color-lightblue-border: #BBE0EC;
+  --color-lightblue-hover: #C5E6F0;
+
+  --color-navy: #1F3442;
+  --color-navy-dark: #15242E;
+  --color-navy-muted: #4A6375;
+  --color-navy-border: #2C4759;
+
+  --color-teal: #39B8A2;
+  --color-teal-dark: #2A9381;
+  --color-teal-light: #E8F7F4;
+}
+
+body {
+  background-color: #FFF8F3;
+  color: #1F3442;
+}
+
 /* Leaflet Tile & Map Styles - Prevent Tailwind reset from collapsing map tiles */
 .leaflet-pane,
 .leaflet-tile,
@@ -27,8 +61,6 @@
 /* CRITICAL: Tailwind CSS reset sets max-width: 100% on img which collapses Leaflet tiles */
 .leaflet-tile-pane img,
 .leaflet-tile,
-.leaflet-marker-icon,
-.leaflet-marker-shadow,
 .leaflet-tile-container img {
   max-width: none !important;
   max-height: none !important;
@@ -40,10 +72,12 @@
   box-shadow: none !important;
 }
 
-/* Custom price marker bubbles styling */
+/* Custom price marker bubbles styling - ensure container never forces extra width/height */
 .custom-comp-marker {
-  background: transparent;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 /* Ensure controls are clickable above tiles */

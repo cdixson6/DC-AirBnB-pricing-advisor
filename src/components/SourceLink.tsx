@@ -22,13 +22,13 @@ export const SourceLink: React.FC<SourceLinkProps> = ({
           e.stopPropagation();
           onClick(e);
         }}
-        className={`inline-flex items-center gap-1 font-semibold text-blue-200 bg-slate-800/90 hover:bg-blue-900/60 hover:text-white border border-slate-700 px-1.5 py-0.5 rounded transition cursor-pointer ${
+        className={`inline-flex items-center gap-1 font-semibold text-[#D8EEF5] bg-[#1F3442] hover:bg-[#1877A3] hover:text-white border border-[#2C4759] px-1.5 py-0.5 rounded transition cursor-pointer ${
           size === 'xs' ? 'text-[10px]' : 'text-xs'
         } ${className}`}
         title="View calculation formula, comp count, filters, and comp IDs"
         aria-label="View data source and comp registry"
       >
-        <Info className="w-2.5 h-2.5 text-blue-300" />
+        <Info className="w-2.5 h-2.5 text-[#39B8A2]" />
         <span>Source</span>
       </button>
     );
@@ -42,13 +42,13 @@ export const SourceLink: React.FC<SourceLinkProps> = ({
           e.stopPropagation();
           onClick(e);
         }}
-        className={`inline-flex items-center gap-0.5 font-bold text-blue-700 hover:text-blue-900 hover:underline cursor-pointer transition ${
+        className={`inline-flex items-center gap-0.5 font-bold text-[#1877A3] hover:text-[#125C7E] hover:underline cursor-pointer transition ${
           size === 'xs' ? 'text-[10.5px]' : 'text-xs'
         } ${className}`}
         title="View calculation formula, comp count, filters, and comp IDs"
         aria-label="View data source and comp registry"
       >
-        <Info className="w-3 h-3 text-blue-600" />
+        <Info className="w-3 h-3 text-[#1877A3]" />
         <span>Source</span>
       </button>
     );
@@ -62,7 +62,7 @@ export const SourceLink: React.FC<SourceLinkProps> = ({
           e.stopPropagation();
           onClick(e);
         }}
-        className={`inline-flex items-center gap-0.5 text-slate-400 hover:text-blue-700 hover:bg-blue-50 px-1 py-0.5 rounded cursor-pointer transition text-[10px] font-medium ${className}`}
+        className={`inline-flex items-center gap-0.5 text-[#4A6375] hover:text-[#1877A3] hover:bg-[#D8EEF5]/50 px-1 py-0.5 rounded cursor-pointer transition text-[10px] font-medium ${className}`}
         title="View source audit data"
         aria-label="View data source and comp registry"
       >
@@ -80,11 +80,11 @@ export const SourceLink: React.FC<SourceLinkProps> = ({
           e.stopPropagation();
           onClick(e);
         }}
-        className={`inline-flex items-center gap-1 font-bold text-blue-800 bg-blue-100 hover:bg-blue-200 px-2 py-0.5 rounded-full cursor-pointer transition text-[10px] ${className}`}
+        className={`inline-flex items-center gap-1 font-bold text-[#1877A3] bg-[#D8EEF5] hover:bg-[#C5E6F0] px-2 py-0.5 rounded-full cursor-pointer transition text-[10px] ${className}`}
         title="View calculation formula, comp count, filters, and comp IDs"
         aria-label="View data source and comp registry"
       >
-        <Info className="w-2.5 h-2.5 text-blue-700" />
+        <Info className="w-2.5 h-2.5 text-[#1877A3]" />
         <span>Source</span>
       </button>
     );
@@ -98,13 +98,13 @@ export const SourceLink: React.FC<SourceLinkProps> = ({
         e.stopPropagation();
         onClick(e);
       }}
-      className={`inline-flex items-center gap-1 font-bold text-blue-800 bg-blue-50/90 hover:bg-blue-100 hover:text-blue-950 border border-blue-200/90 px-1.5 py-0.5 rounded transition cursor-pointer shadow-2xs ${
+      className={`inline-flex items-center gap-1 font-bold text-[#1877A3] bg-[#D8EEF5]/70 hover:bg-[#D8EEF5] hover:text-[#125C7E] border border-[#1877A3]/30 px-1.5 py-0.5 rounded transition cursor-pointer shadow-2xs ${
         size === 'xs' ? 'text-[10px]' : 'text-xs'
       } ${className}`}
       title="View calculation formula, comp count, filters, and comp IDs"
       aria-label="View data source and comp registry"
     >
-      <Info className="w-2.5 h-2.5 text-blue-600 shrink-0" />
+      <Info className="w-2.5 h-2.5 text-[#1877A3] shrink-0" />
       <span>Source</span>
     </button>
   );

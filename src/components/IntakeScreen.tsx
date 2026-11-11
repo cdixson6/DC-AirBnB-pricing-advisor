@@ -81,20 +81,20 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
       <div className="mb-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1877A3] bg-[#D8EEF5] px-2.5 py-1 rounded-md border border-[#1877A3]/30">
               Screen 1 • Client Property Intake
             </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">
-              Property Consultation & Intake
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1877A3] mt-2 tracking-tight">
+              Property Consultation &amp; Intake
             </h1>
-            <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+            <p className="text-sm text-[#4A6375] mt-1 max-w-2xl">
               Enter the homeowner&apos;s property details to build a verified Inside Airbnb comp set, calculate recommended nightly rates, and project annual returns under Washington, DC municipal regulations.
             </p>
           </div>
 
           {/* Quick Presets */}
           <div className="flex flex-wrap gap-1.5 self-start sm:self-center">
-            <span className="text-[11px] font-semibold text-slate-400 self-center mr-1">Presets:</span>
+            <span className="text-[11px] font-semibold text-[#4A6375] self-center mr-1">Presets:</span>
             <button
               type="button"
               onClick={() =>
@@ -113,7 +113,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   ownerLivesThere: false,
                 })
               }
-              className="text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
+              className="text-xs bg-white hover:bg-[#D8EEF5]/40 text-[#1F3442] border border-[#EFE3D8] hover:border-[#1877A3] px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
             >
               Dupont 1BR Condo
             </button>
@@ -135,7 +135,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   ownerLivesThere: true,
                 })
               }
-              className="text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
+              className="text-xs bg-white hover:bg-[#D8EEF5]/40 text-[#1F3442] border border-[#EFE3D8] hover:border-[#1877A3] px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
             >
               Capitol Hill 2BR (Hosted)
             </button>
@@ -157,7 +157,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   ownerLivesThere: false,
                 })
               }
-              className="text-xs bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
+              className="text-xs bg-white hover:bg-[#D8EEF5]/40 text-[#1F3442] border border-[#EFE3D8] hover:border-[#1877A3] px-2.5 py-1 rounded-md font-medium transition cursor-pointer"
             >
               Georgetown 3BR Luxury
             </button>
@@ -181,23 +181,23 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         className="space-y-6"
       >
         {/* Section 1: Location & Property Type */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <Building2 className="w-5 h-5 text-blue-700" />
-            <h2 className="text-base font-bold text-slate-900">Location & Structure</h2>
+        <div className="bg-white rounded-xl border border-[#EFE3D8] shadow-xs p-6 space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-[#EFE3D8]">
+            <Building2 className="w-5 h-5 text-[#1877A3]" />
+            <h2 className="text-base font-bold text-[#1877A3]">Location &amp; Structure</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Neighborhood Dropdown */}
             <div>
-              <label htmlFor="neighborhood" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Neighborhood (DC Cleansed) <span className="text-rose-600">*</span>
+              <label htmlFor="neighborhood" className="block text-xs font-bold text-[#1F3442] uppercase tracking-wider mb-1.5">
+                Neighborhood (DC Cleansed) <span className="text-[#E76F51]">*</span>
               </label>
               <select
                 id="neighborhood"
                 value={intake.neighborhood}
                 onChange={(e) => updateField('neighborhood', e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:bg-white"
+                className="w-full px-3 py-2 bg-[#FFF8F3] border border-[#EFE3D8] rounded-lg text-sm text-[#1F3442] focus:outline-hidden focus:ring-2 focus:ring-[#1877A3] focus:bg-white"
                 required
               >
                 {neighborhoods.map((n) => (
@@ -206,21 +206,21 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   </option>
                 ))}
               </select>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#4A6375] mt-1">
                 Matches official Inside Airbnb Washington, D.C. neighborhood boundary.
               </p>
             </div>
 
             {/* Room Type */}
             <div>
-              <label htmlFor="roomType" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Room Type <span className="text-rose-600">*</span>
+              <label htmlFor="roomType" className="block text-xs font-bold text-[#1F3442] uppercase tracking-wider mb-1.5">
+                Room Type <span className="text-[#E76F51]">*</span>
               </label>
               <select
                 id="roomType"
                 value={intake.roomType}
                 onChange={(e) => updateField('roomType', e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:bg-white"
+                className="w-full px-3 py-2 bg-[#FFF8F3] border border-[#EFE3D8] rounded-lg text-sm text-[#1F3442] focus:outline-hidden focus:ring-2 focus:ring-[#1877A3] focus:bg-white"
                 required
               >
                 {roomTypes.map((rt) => (
@@ -229,7 +229,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   </option>
                 ))}
               </select>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="text-[11px] text-[#4A6375] mt-1">
                 Entire home/apt, Private room, or Shared room.
               </p>
             </div>
@@ -237,12 +237,12 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
           {/* Condo Toggle */}
           <div className="pt-2">
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-[#D8EEF5]/30 border border-[#BBE0EC] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <span className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                <span className="font-bold text-sm text-[#1F3442] flex items-center gap-1.5">
                   Is this property a Condominium?
                 </span>
-                <p className="text-xs text-slate-600 mt-0.5">
+                <p className="text-xs text-[#4A6375] mt-0.5">
                   Rule: Advisor will filter strictly to Condos only if 15+ comps exist; otherwise includes all property types.
                 </p>
               </div>
@@ -252,8 +252,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   onClick={() => updateField('isCondo', true)}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                     intake.isCondo
-                      ? 'bg-blue-900 text-white shadow-xs'
-                      : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
+                      ? 'bg-[#1877A3] text-white shadow-xs'
+                      : 'bg-white text-[#1F3442] border border-[#EFE3D8] hover:bg-[#D8EEF5]/40'
                   }`}
                 >
                   Yes (Condo)
@@ -263,8 +263,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   onClick={() => updateField('isCondo', false)}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer ${
                     !intake.isCondo
-                      ? 'bg-blue-900 text-white shadow-xs'
-                      : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-100'
+                      ? 'bg-[#1877A3] text-white shadow-xs'
+                      : 'bg-white text-[#1F3442] border border-[#EFE3D8] hover:bg-[#D8EEF5]/40'
                   }`}
                 >
                   No (Townhouse / Unit)
@@ -275,16 +275,16 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         </div>
 
         {/* Section 2: Capacity & Specifications */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-            <Home className="w-5 h-5 text-blue-700" />
-            <h2 className="text-base font-bold text-slate-900">Capacity & Floor Plan</h2>
+        <div className="bg-white rounded-xl border border-[#EFE3D8] shadow-xs p-6 space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-[#EFE3D8]">
+            <Home className="w-5 h-5 text-[#1877A3]" />
+            <h2 className="text-base font-bold text-[#1877A3]">Capacity &amp; Floor Plan</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {/* Bedrooms */}
             <div>
-              <label htmlFor="bedrooms" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label htmlFor="bedrooms" className="block text-xs font-bold text-[#1F3442] uppercase tracking-wider mb-1.5">
                 <span className="flex items-center gap-1">
                   <Bed className="w-3.5 h-3.5" /> Bedrooms
                 </span>
@@ -293,7 +293,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 id="bedrooms"
                 value={intake.bedrooms}
                 onChange={(e) => updateField('bedrooms', parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:bg-white"
+                className="w-full px-3 py-2 bg-[#FFF8F3] border border-[#EFE3D8] rounded-lg text-sm text-[#1F3442] focus:outline-hidden focus:ring-2 focus:ring-[#1877A3] focus:bg-white"
               >
                 <option value={0}>0 (Studio)</option>
                 <option value={1}>1 Bedroom</option>
@@ -306,7 +306,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
             {/* Bathrooms */}
             <div>
-              <label htmlFor="bathrooms" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label htmlFor="bathrooms" className="block text-xs font-bold text-[#1F3442] uppercase tracking-wider mb-1.5">
                 <span className="flex items-center gap-1">
                   <Bath className="w-3.5 h-3.5" /> Bathrooms
                 </span>
@@ -315,7 +315,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 id="bathrooms"
                 value={intake.bathrooms}
                 onChange={(e) => updateField('bathrooms', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:bg-white"
+                className="w-full px-3 py-2 bg-[#FFF8F3] border border-[#EFE3D8] rounded-lg text-sm text-[#1F3442] focus:outline-hidden focus:ring-2 focus:ring-[#1877A3] focus:bg-white"
               >
                 <option value={1}>1 Bath</option>
                 <option value={1.5}>1.5 Baths</option>
@@ -328,7 +328,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
             {/* Guests (Accommodates) */}
             <div>
-              <label htmlFor="accommodates" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label htmlFor="accommodates" className="block text-xs font-bold text-[#1F3442] uppercase tracking-wider mb-1.5">
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" /> Max Guests
                 </span>
@@ -337,7 +337,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 id="accommodates"
                 value={intake.accommodates}
                 onChange={(e) => updateField('accommodates', parseInt(e.target.value, 10))}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:bg-white"
+                className="w-full px-3 py-2 bg-[#FFF8F3] border border-[#EFE3D8] rounded-lg text-sm text-[#1F3442] focus:outline-hidden focus:ring-2 focus:ring-[#1877A3] focus:bg-white"
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((g) => (
                   <option key={g} value={g}>
@@ -350,13 +350,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         </div>
 
         {/* Section 3: Amenities Checkboxes */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="bg-white rounded-xl border border-[#EFE3D8] shadow-xs p-6 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#EFE3D8]">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-blue-700" />
+              <Sparkles className="w-5 h-5 text-[#39B8A2]" />
               <div>
-                <h2 className="text-base font-bold text-slate-900">Amenities</h2>
-                <p className="text-xs text-slate-500">
+                <h2 className="text-base font-bold text-[#1877A3]">Amenities</h2>
+                <p className="text-xs text-[#4A6375]">
                   Select available features to benchmark against neighborhood amenity uplifts
                 </p>
               </div>
@@ -368,8 +368,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             <label
               className={`p-3.5 rounded-lg border flex items-center justify-between cursor-pointer transition ${
                 intake.hasWasher
-                  ? 'bg-blue-50/70 border-blue-400 text-blue-950 font-semibold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/60'
+                  ? 'bg-[#D8EEF5]/70 border-[#1877A3] text-[#1F3442] font-semibold'
+                  : 'bg-[#FFF8F3] border-[#EFE3D8] text-[#4A6375] hover:bg-[#D8EEF5]/30'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -377,9 +377,9 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   type="checkbox"
                   checked={intake.hasWasher}
                   onChange={(e) => updateField('hasWasher', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-[#39B8A2] rounded border-[#EFE3D8] focus:ring-[#39B8A2]"
                 />
-                <span className="text-xs">Washer & Dryer</span>
+                <span className="text-xs">Washer &amp; Dryer</span>
               </div>
             </label>
 
@@ -387,8 +387,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             <label
               className={`p-3.5 rounded-lg border flex items-center justify-between cursor-pointer transition ${
                 intake.hasParking
-                  ? 'bg-blue-50/70 border-blue-400 text-blue-950 font-semibold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/60'
+                  ? 'bg-[#D8EEF5]/70 border-[#1877A3] text-[#1F3442] font-semibold'
+                  : 'bg-[#FFF8F3] border-[#EFE3D8] text-[#4A6375] hover:bg-[#D8EEF5]/30'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -396,7 +396,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   type="checkbox"
                   checked={intake.hasParking}
                   onChange={(e) => updateField('hasParking', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-[#39B8A2] rounded border-[#EFE3D8] focus:ring-[#39B8A2]"
                 />
                 <span className="text-xs">Dedicated Parking</span>
               </div>
@@ -406,8 +406,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             <label
               className={`p-3.5 rounded-lg border flex items-center justify-between cursor-pointer transition ${
                 intake.hasWorkspace
-                  ? 'bg-blue-50/70 border-blue-400 text-blue-950 font-semibold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/60'
+                  ? 'bg-[#D8EEF5]/70 border-[#1877A3] text-[#1F3442] font-semibold'
+                  : 'bg-[#FFF8F3] border-[#EFE3D8] text-[#4A6375] hover:bg-[#D8EEF5]/30'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -415,7 +415,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   type="checkbox"
                   checked={intake.hasWorkspace}
                   onChange={(e) => updateField('hasWorkspace', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-[#39B8A2] rounded border-[#EFE3D8] focus:ring-[#39B8A2]"
                 />
                 <span className="text-xs">Dedicated Workspace</span>
               </div>
@@ -425,8 +425,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             <label
               className={`p-3.5 rounded-lg border flex items-center justify-between cursor-pointer transition ${
                 intake.hasAc
-                  ? 'bg-blue-50/70 border-blue-400 text-blue-950 font-semibold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/60'
+                  ? 'bg-[#D8EEF5]/70 border-[#1877A3] text-[#1F3442] font-semibold'
+                  : 'bg-[#FFF8F3] border-[#EFE3D8] text-[#4A6375] hover:bg-[#D8EEF5]/30'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -434,7 +434,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   type="checkbox"
                   checked={intake.hasAc}
                   onChange={(e) => updateField('hasAc', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-[#39B8A2] rounded border-[#EFE3D8] focus:ring-[#39B8A2]"
                 />
                 <span className="text-xs">Air Conditioning (AC)</span>
               </div>
@@ -444,8 +444,8 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             <label
               className={`p-3.5 rounded-lg border flex items-center justify-between cursor-pointer transition ${
                 intake.hasSelfCheckin
-                  ? 'bg-blue-50/70 border-blue-400 text-blue-950 font-semibold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/60'
+                  ? 'bg-[#D8EEF5]/70 border-[#1877A3] text-[#1F3442] font-semibold'
+                  : 'bg-[#FFF8F3] border-[#EFE3D8] text-[#4A6375] hover:bg-[#D8EEF5]/30'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -453,7 +453,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   type="checkbox"
                   checked={intake.hasSelfCheckin}
                   onChange={(e) => updateField('hasSelfCheckin', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                  className="w-4 h-4 text-[#39B8A2] rounded border-[#EFE3D8] focus:ring-[#39B8A2]"
                 />
                 <span className="text-xs">Self Check-in Keypad</span>
               </div>
@@ -462,19 +462,19 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         </div>
 
         {/* Section 4: Critical DC Municipal Regulation: Owner Residency */}
-        <div className="bg-slate-900 text-white rounded-xl shadow-md p-6 space-y-4">
+        <div className="bg-[#1F3442] text-white rounded-xl shadow-md p-6 space-y-4 border border-[#2C4759]">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-rose-600 rounded-lg text-white mt-0.5">
+            <div className="p-2 bg-[#E76F51] rounded-lg text-white mt-0.5">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold tracking-wider uppercase text-rose-300">
+              <span className="text-[10px] font-bold tracking-wider uppercase text-[#D8EEF5]">
                 DC Municipal Regulation • DLCP Compliance
               </span>
               <h2 className="text-base font-bold text-white mt-0.5">
                 Will the owner live there during stays?
               </h2>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+              <p className="text-xs text-[#D8EEF5]/80 mt-1 leading-relaxed">
                 Under the Washington DC Short-Term Rental Regulation Act, if the owner is <strong>absent</strong> during guest stays (Vacation Rental endorsement), the listing is legally capped at a strict maximum of <strong>90 nights per calendar year</strong>. Hosted properties with the owner residing on-site have unlimited nights.
               </p>
             </div>
@@ -486,20 +486,20 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               onClick={() => updateField('ownerLivesThere', true)}
               className={`p-4 rounded-xl border text-left transition cursor-pointer flex items-start gap-3 ${
                 intake.ownerLivesThere
-                  ? 'bg-blue-600/30 border-blue-400 ring-2 ring-blue-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800'
+                  ? 'bg-[#1877A3]/50 border-[#39B8A2] ring-2 ring-[#39B8A2] text-white'
+                  : 'bg-[#15242E] border-[#2C4759] text-[#D8EEF5]/80 hover:bg-[#1877A3]/30'
               }`}
             >
               <div className="mt-0.5">
                 {intake.ownerLivesThere ? (
-                  <CheckCircle className="w-5 h-5 text-blue-400" />
+                  <CheckCircle className="w-5 h-5 text-[#39B8A2]" />
                 ) : (
-                  <div className="w-5 h-5 rounded-full border border-slate-500" />
+                  <div className="w-5 h-5 rounded-full border border-[#4A6375]" />
                 )}
               </div>
               <div>
                 <span className="text-sm font-bold block text-white">Yes — Owner Lives There (Hosted)</span>
-                <span className="text-[11px] text-slate-300 block mt-1">
+                <span className="text-[11px] text-[#D8EEF5]/80 block mt-1">
                   Full 365-day potential. No statutory 90-night cap applies under DC Short-Term Rental endorsement.
                 </span>
               </div>
@@ -510,20 +510,20 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               onClick={() => updateField('ownerLivesThere', false)}
               className={`p-4 rounded-xl border text-left transition cursor-pointer flex items-start gap-3 ${
                 !intake.ownerLivesThere
-                  ? 'bg-rose-950/40 border-rose-500 ring-2 ring-rose-500 text-white'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800'
+                  ? 'bg-[#E76F51]/30 border-[#E76F51] ring-2 ring-[#E76F51] text-white'
+                  : 'bg-[#15242E] border-[#2C4759] text-[#D8EEF5]/80 hover:bg-[#1877A3]/30'
               }`}
             >
               <div className="mt-0.5">
                 {!intake.ownerLivesThere ? (
-                  <CheckCircle className="w-5 h-5 text-rose-400" />
+                  <CheckCircle className="w-5 h-5 text-[#E76F51]" />
                 ) : (
-                  <div className="w-5 h-5 rounded-full border border-slate-500" />
+                  <div className="w-5 h-5 rounded-full border border-[#4A6375]" />
                 )}
               </div>
               <div>
                 <span className="text-sm font-bold block text-white">No — Owner Absent (Vacation Rental)</span>
-                <span className="text-[11px] text-rose-200 block mt-1">
+                <span className="text-[11px] text-[#D8EEF5]/80 block mt-1">
                   Strict 90-night statutory cap applies. Revenue projections will calculate both full vs. capped earnings.
                 </span>
               </div>
@@ -532,11 +532,11 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         </div>
 
         {/* Live Filter Summary & Submit Bar */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-md p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="text-xs text-slate-600 space-y-0.5">
-            <div className="flex items-center flex-wrap gap-1.5 font-bold text-slate-900 text-sm">
+        <div className="bg-white rounded-xl border border-[#EFE3D8] shadow-md p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="text-xs text-[#4A6375] space-y-0.5">
+            <div className="flex items-center flex-wrap gap-1.5 font-bold text-[#1F3442] text-sm">
               <span>Ready to benchmark</span>
-              <span className="font-mono text-blue-800 font-extrabold">{previewComps.length}</span>
+              <span className="font-mono text-[#E76F51] font-extrabold">{previewComps.length}</span>
               <span>active comps in {intake.neighborhood}</span>
               {onOpenSource && (
                 <SourceLink
@@ -561,11 +561,11 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 />
               )}
             </div>
-            <div className="text-slate-500 flex items-center flex-wrap gap-1 mt-0.5">
+            <div className="text-[#4A6375] flex items-center flex-wrap gap-1 mt-0.5">
               {intake.isCondo ? (
                 <>
                   <span>Condo sample:</span>
-                  <strong className="font-mono text-slate-700">{condoPreviewCount} listings</strong>
+                  <strong className="font-mono text-[#1877A3]">{condoPreviewCount} listings</strong>
                   {onOpenSource && (
                     <SourceLink
                       variant="subtle"
@@ -599,7 +599,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
           <button
             type="submit"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#E76F51] hover:bg-[#D55C3E] text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition cursor-pointer"
           >
             <span>Generate Comp Analysis &amp; Price Advisory</span>
             <ArrowRight className="w-4 h-4" />
